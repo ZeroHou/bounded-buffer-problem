@@ -1,0 +1,36 @@
+#include<iostream>
+#include"semaphore.h"
+using namespace std;
+
+semaphore empt(0), full(100), mtx(1);
+int val = 0;
+
+void produce() {
+	for (int i = 0; i < 10000; i++) {
+		full.wait();
+		mtx.wait();
+		val++;
+		cout << "val: " << val << endl;
+		mtx.signal();
+		empt.signal();
+
+	}
+}
+
+void consume() {
+	for (int i = 0; i < 10000; i++) {
+		empt.wait();
+		mtx.wait();
+		val--;
+		cout << "val: " << val << endl;
+		mtx.signal();
+		full.signal();
+	}
+}
+
+int main() {
+	thread pro_thread(produce);
+	thread con_thread(consume);
+	pro_thread.join();
+	con_thread.join();
+}
